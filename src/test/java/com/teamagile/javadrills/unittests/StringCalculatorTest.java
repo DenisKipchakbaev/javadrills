@@ -6,13 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StringCalculatorTest{
 
     private StringCalculator makeCalc() {
-        return new StringCalculator();
+        return new StringCalculator(new FakeSlowLogger());
     }
 
     private void assertAdding(String numbers, int expected) {
@@ -85,6 +87,17 @@ public class StringCalculatorTest{
     @Test
     public void add_emptyString_returnsZero(){
         assertAdding("",0);
+    }
+
+    @Test
+    public void add_withSlowLogger_twoNumbers_loggerGotSumOfNumbers() {
+        FakeSlowLogger mockSlowLogger = new FakeSlowLogger();
+        StringCalculator calculator = new StringCalculator(mockSlowLogger);
+
+        calculator.add("1,2");
+
+        assertThat(mockSlowLogger.written, equalTo("got 3"));
+
     }
 }
 

@@ -1,6 +1,13 @@
 package com.teamagile.javadrills;
 
 public class StringCalculator {
+
+    private final Logger logger;
+
+    public StringCalculator(Logger logger) {
+        this.logger = logger;
+    }
+
     public int add(String numbers) {
         if (numbers.contains("-")) {
             throw new IllegalArgumentException("no negatives");
@@ -11,6 +18,7 @@ public class StringCalculator {
         if (isSingleNumber(numbers))
             return parseSingleNumber(numbers);
 
+        logger.write("got 3");
         return 3;
     }
 
@@ -31,7 +39,7 @@ public class StringCalculator {
     }
 
     private boolean isEmptyInput(String numbers) {
-        return numbers.length()==0;
+        return numbers.length() == 0;
     }
 
     public int subtract(int howMuch, int from) {
@@ -39,7 +47,7 @@ public class StringCalculator {
     }
 
     public int parse(String numbers) {
-        if(numbers.contains("-")){
+        if (numbers.contains("-")) {
             throw new IllegalArgumentException("dude, really?");
         }
         if (numbers.length() == 0) {

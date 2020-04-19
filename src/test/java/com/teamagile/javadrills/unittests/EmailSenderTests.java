@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.*;
 public class EmailSenderTests {
 
     private StringCalculator makeCalc() {
-        return new StringCalculator();
+        return new StringCalculator(new FakeSlowLogger());
     }
 
 
