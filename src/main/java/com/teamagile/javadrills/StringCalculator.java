@@ -3,12 +3,14 @@ package com.teamagile.javadrills;
 public class StringCalculator {
 
     private final Logger logger;
+    private final SlowWebService webService;
 
-    public StringCalculator(Logger logger) {
+    public StringCalculator(Logger logger, SlowWebService webService) {
         this.logger = logger;
+        this.webService = webService;
     }
 
-    public int add(String numbers) {
+    public int add(String numbers) throws InterruptedException {
         if (numbers.contains("-")) {
             throw new IllegalArgumentException("no negatives");
         }
@@ -18,7 +20,12 @@ public class StringCalculator {
         if (isSingleNumber(numbers))
             return parseSingleNumber(numbers);
 
-        logger.write("got 3");
+        try {
+            logger.write("got 3");
+        } catch (RuntimeException e) {
+            webService.notify("got '" + e.getMessage() + "'");
+        }
+
         return 3;
     }
 

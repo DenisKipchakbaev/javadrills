@@ -3,16 +3,17 @@ package com.teamagile.javadrills.unittests;
 
 import com.teamagile.javadrills.EmailSender;
 import com.teamagile.javadrills.EmailServer;
+import com.teamagile.javadrills.SlowWebService;
 import com.teamagile.javadrills.StringCalculator;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 
 public class EmailSenderTests {
 
     private StringCalculator makeCalc() {
-        return new StringCalculator(new FakeSlowLogger());
+        return new StringCalculator(new FakeSlowLogger(), new SlowWebService());
     }
 
 

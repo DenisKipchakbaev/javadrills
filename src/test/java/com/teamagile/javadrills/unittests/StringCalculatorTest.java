@@ -1,6 +1,8 @@
 package com.teamagile.javadrills.unittests;
 
 
+import com.teamagile.javadrills.Logger;
+import com.teamagile.javadrills.SlowWebService;
 import com.teamagile.javadrills.StringCalculator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class StringCalculatorTest{
 
     private StringCalculator makeCalc() {
-        return new StringCalculator(new FakeSlowLogger());
+        return new StringCalculator(new FakeSlowLogger(), new SlowWebService());
     }
 
-    private void assertAdding(String numbers, int expected) {
+    private void assertAdding(String numbers, int expected) throws InterruptedException {
         StringCalculator sc = makeCalc();
 
         int result = sc.add(numbers);
@@ -26,11 +28,11 @@ public class StringCalculatorTest{
     }
 
 
-   @Test
-    public void add_emptyString_returnsDefault(){
+    @Test
+    public void add_emptyString_returnsDefault() throws InterruptedException {
         StringCalculator calc = makeCalc();
         int result = calc.add("");
-        assertEquals(0,result);
+        assertEquals(0, result);
     }
 
 
@@ -72,32 +74,57 @@ public class StringCalculatorTest{
 //        assertFalse(true);
 //
 //    }
-    @Test
-    public void add_multipleNumbers_returnstheSum(){
-        assertAdding("1,2", 3);
-    }
+@Test
+public void add_multipleNumbers_returnstheSum() throws InterruptedException {
+    assertAdding("1,2", 3);
+}
 
     @Test
-    public void add_singleNumber_returnsThatNumber(){
+    public void add_singleNumber_returnsThatNumber() throws InterruptedException {
         assertAdding("1", 1);
     }
 
 
-
     @Test
-    public void add_emptyString_returnsZero(){
-        assertAdding("",0);
+    public void add_emptyString_returnsZero() throws InterruptedException {
+        assertAdding("", 0);
     }
 
     @Test
-    public void add_withSlowLogger_twoNumbers_loggerGotSumOfNumbers() {
+    public void add_withSlowLoggerAndTwoNumbers_loggerGotSumOfNumbers() throws InterruptedException {
         FakeSlowLogger mockSlowLogger = new FakeSlowLogger();
-        StringCalculator calculator = new StringCalculator(mockSlowLogger);
+        SlowWebService stubWebService = new SlowWebService();
+        StringCalculator calculator = new StringCalculator(mockSlowLogger, stubWebService);
 
         calculator.add("1,2");
 
         assertThat(mockSlowLogger.written, equalTo("got 3"));
 
+    }
+
+    class FakeLoggerThrowingError implements Logger {
+        public void write(String text) {
+            throw new RuntimeException("fake error");
+        }
+    }
+
+    class FakeSlowWebService extends SlowWebService {
+        String written;
+
+        public void notify(String text) {
+            written = text;
+        }
+    }
+
+    @Test
+    public void add_whenLoggerThrowsError_webServiceNotified() throws InterruptedException {
+        Logger fakeLoggerStub = new FakeLoggerThrowingError();
+        FakeSlowWebService webServiceMock = new FakeSlowWebService();
+        StringCalculator calculator = new StringCalculator(fakeLoggerStub, webServiceMock);
+
+        calculator.add("1,2");
+
+        assertEquals("got 'fake error'", webServiceMock.written);
     }
 }
 
