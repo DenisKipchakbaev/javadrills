@@ -7,15 +7,21 @@ import java.util.List;
 public class LoginManager {
 
     private final Logger logger;
+    private final SlowWebService webService;
     private List<User> users = new ArrayList<User>();
 
-    public LoginManager(Logger logger) {
+    public LoginManager(Logger logger, SlowWebService webService) {
         this.logger = logger;
+        this.webService = webService;
     }
 
-    public void addUser(String user, String pass) {
+    public void addUser(String user, String pass) throws InterruptedException {
         users.add(new User(user, pass));
-        logger.write(String.format("logon by user '%s' and password '%s'", user, pass));
+        try {
+            logger.write(String.format("logon by user '%s' and password '%s'", user, pass));
+        } catch (RuntimeException e) {
+            webService.notify("the error from the logger");
+        }
     }
 
     public Boolean isLoginOK(String user, String pass) {
