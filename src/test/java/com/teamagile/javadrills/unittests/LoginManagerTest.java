@@ -9,14 +9,13 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 
 public class LoginManagerTest {
 
-    private SlowLogger loggerMock = Mockito.mock(SlowLogger.class);
-    private SlowWebService webServiceMock = Mockito.mock(SlowWebService.class);
+    private final SlowLogger loggerMock = Mockito.mock(SlowLogger.class);
+    private final SlowWebService webServiceMock = Mockito.mock(SlowWebService.class);
 
     @Test
     public void isLoginOK_withNoUsers_returnsFalse() {
@@ -59,5 +58,16 @@ public class LoginManagerTest {
         lm.addUser("a", "pass");
 
         verify(webServiceMock).notify("the error from the logger");
+    }
+
+    @Test
+    public void changePassword_existingUser_loggerNotified() throws InterruptedException {
+        LoginManager lm = getLoginManager();
+        lm.addUser("a", "pass1");
+        clearInvocations(loggerMock);
+
+        lm.changePassword("a", "pass1", "pass2");
+
+        verify(loggerMock).write("user changed passwords:a");
     }
 }

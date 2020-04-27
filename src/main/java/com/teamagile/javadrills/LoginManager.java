@@ -34,4 +34,8 @@ public class LoginManager {
         }
         return false;
     }
+
+    public void changePassword(String user, String currentPassword, String newPassword) {
+        logger.write("user changed passwords:" + user);
+    }
 }
