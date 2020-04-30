@@ -9,7 +9,11 @@ public class LoginManagerWithFuture {
 
     public void addUser(String user, String pass) throws Throwable {
         users.add(new User(user, pass));
-        new SlowLogger().write("added user");
+        writeLog(String.format("user added: %s, %s", user, pass));
+    }
+
+    void writeLog(String message) {
+        new SlowLogger().write(message);
     }
 
     public Boolean isLoginOK(String user, String pass) {
