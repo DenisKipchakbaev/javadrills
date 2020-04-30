@@ -9,7 +9,11 @@ public class LoginManagerWIthStatics {
 
     public void addUser(String user, String pass) throws Throwable {
         users.add(new User(user, pass));
-        StaticLogger.write("user added" + user + pass);
+        log("user added: " + user + ", " + pass);
+    }
+
+    void log(String message) throws InterruptedException {
+        StaticLogger.write(message);
     }
 
     public Boolean isLoginOK(String user, String pass) {
