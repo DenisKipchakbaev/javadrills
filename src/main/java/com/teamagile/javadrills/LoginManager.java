@@ -3,6 +3,7 @@ package com.teamagile.javadrills;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 public class LoginManager {
 
@@ -18,9 +19,9 @@ public class LoginManager {
     public void addUser(String user, String pass) throws InterruptedException {
         users.add(new User(user, pass));
         try {
-            TraceMessage traceMessage = new TraceMessage();
-            traceMessage.setText(String.format("logon by user '%s' and password '%s'", user, pass));
-            traceMessage.setSeverity(100);
+            TraceMessage traceMessage = new TraceMessage(
+                    String.format("logon by user '%s' and password '%s'", user, pass),
+                    100);
             logger.write(traceMessage);
         } catch (RuntimeException e) {
             webService.notify("the error from the logger");
@@ -38,7 +39,14 @@ public class LoginManager {
         return false;
     }
 
-    public void changePassword(String user, String currentPassword, String newPassword) {
-        logger.write("user changed passwords:" + user);
+    public void changePassword(final String user, final String currentPassword, String newPassword) {
+        Optional<User> userOpt = users.stream()
+                .filter(u -> u.username.equals(user) && u.password.equals(currentPassword))
+                .findAny();
+        if (userOpt.isPresent()) {
+            logger.write("user changed passwords:" + user);
+        } else {
+            logger.write(new TraceMessage("password not changed", 0));
+        }
     }
 }

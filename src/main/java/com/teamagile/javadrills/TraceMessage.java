@@ -5,6 +5,11 @@ public class TraceMessage {
     private String text;
     private int severity;
 
+    public TraceMessage(String text, int severity) {
+        this.text = text;
+        this.severity = severity;
+    }
+
     public String getText() {
         return text;
     }

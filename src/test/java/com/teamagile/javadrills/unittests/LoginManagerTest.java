@@ -75,4 +75,19 @@ public class LoginManagerTest {
 
         verify(loggerMock).write("user changed passwords:a");
     }
+
+    @Test
+    public void changePassword_existingUserAndWrongPassword_logError() throws InterruptedException {
+        LoginManager lm = getLoginManager();
+        lm.addUser("a", "pass1");
+        clearInvocations(loggerMock);
+
+        lm.changePassword("a", "badpass", "pass2");
+
+        ArgumentCaptor<TraceMessage> traceMessageCaptor = ArgumentCaptor.forClass(TraceMessage.class);
+        verify(loggerMock).write(traceMessageCaptor.capture());
+        TraceMessage traceMessage = traceMessageCaptor.getValue();
+        assertEquals("password not changed", traceMessage.getText());
+        ;
+    }
 }
