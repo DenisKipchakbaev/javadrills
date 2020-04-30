@@ -3,12 +3,13 @@ package com.teamagile.javadrills.unittests;
 import com.teamagile.javadrills.LoginManager;
 import com.teamagile.javadrills.SlowLogger;
 import com.teamagile.javadrills.SlowWebService;
+import com.teamagile.javadrills.TraceMessage;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
@@ -47,13 +48,17 @@ public class LoginManagerTest {
 
         lm.addUser("a", "pass");
 
-        verify(loggerMock).write("logon by user 'a' and password 'pass'");
+        ArgumentCaptor<TraceMessage> traceMessageCaptor = ArgumentCaptor.forClass(TraceMessage.class);
+        verify(loggerMock).write(traceMessageCaptor.capture());
+        TraceMessage traceMessage = traceMessageCaptor.getValue();
+        assertEquals("logon by user 'a' and password 'pass'", traceMessage.getText());
+        assertEquals(100, traceMessage.getSeverity());
     }
 
     @Test
     public void addUser_loggerThrowsError_webServiceNotified() throws InterruptedException {
         LoginManager lm = getLoginManager();
-        doThrow(RuntimeException.class).when(loggerMock).write(anyString());
+        doThrow(RuntimeException.class).when(loggerMock).write(any(TraceMessage.class));
 
         lm.addUser("a", "pass");
 

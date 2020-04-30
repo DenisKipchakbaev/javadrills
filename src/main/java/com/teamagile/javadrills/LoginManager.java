@@ -18,7 +18,10 @@ public class LoginManager {
     public void addUser(String user, String pass) throws InterruptedException {
         users.add(new User(user, pass));
         try {
-            logger.write(String.format("logon by user '%s' and password '%s'", user, pass));
+            TraceMessage traceMessage = new TraceMessage();
+            traceMessage.setText(String.format("logon by user '%s' and password '%s'", user, pass));
+            traceMessage.setSeverity(100);
+            logger.write(traceMessage);
         } catch (RuntimeException e) {
             webService.notify("the error from the logger");
         }

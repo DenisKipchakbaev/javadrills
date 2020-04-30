@@ -4,6 +4,7 @@ package com.teamagile.javadrills.unittests;
 import com.teamagile.javadrills.Logger;
 import com.teamagile.javadrills.SlowWebService;
 import com.teamagile.javadrills.StringCalculator;
+import com.teamagile.javadrills.TraceMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -104,6 +105,10 @@ public void add_multipleNumbers_returnstheSum() throws InterruptedException {
 
     class FakeLoggerThrowingError implements Logger {
         public void write(String text) {
+            throw new RuntimeException("fake error");
+        }
+
+        public void write(TraceMessage traceMessage) {
             throw new RuntimeException("fake error");
         }
     }

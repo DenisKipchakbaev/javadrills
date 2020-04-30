@@ -10,4 +10,8 @@ public class SlowLogger implements Logger {
         }
 
     }
+
+    @Override
+    public void write(TraceMessage traceMessage) {
+    }
 }
