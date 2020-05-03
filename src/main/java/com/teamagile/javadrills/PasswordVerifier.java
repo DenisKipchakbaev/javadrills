@@ -32,8 +32,15 @@ public class PasswordVerifier {
         }
     }
 
-    public boolean isRequiredNumberOfConditionsSatisfied() {
-        return numberOfConditionsMet >= 3;
+    private void verifyNotNull() {
+        if (password == null) {
+            throw new PasswordVerificationException("password should not be null");
+        }
+        increaseConditionsMetCount();
+    }
+
+    private void increaseConditionsMetCount() {
+        numberOfConditionsMet++;
     }
 
     private void verifyCharRequirements() {
@@ -68,8 +75,12 @@ public class PasswordVerifier {
     }
 
     private void verifyUppercase() {
-        if (!containsUppercase) {
-            addError("password should have one uppercase letter at least");
+        verifyCondition(!containsUppercase, "password should have one uppercase letter at least");
+    }
+
+    private void verifyCondition(boolean conditionForError, String errorMessage) {
+        if (conditionForError) {
+            addError(errorMessage);
         } else {
             increaseConditionsMetCount();
         }
@@ -79,43 +90,25 @@ public class PasswordVerifier {
         errors.add(message);
     }
 
-    private void increaseConditionsMetCount() {
-        numberOfConditionsMet++;
-    }
-
     private void verifyLowercase() {
-        if (!containsLowercase) {
-            addError("password should have one lowercase letter at least");
-        } else {
-            increaseConditionsMetCount();
-        }
-    }
-
-    private void verifyNotNull() {
-        if (password == null) {
-            throw new PasswordVerificationException("password should not be null");
-        }
-        increaseConditionsMetCount();
+        verifyCondition(!containsLowercase, "password should have one lowercase letter at least");
     }
 
     private void verifyNumber() {
-        if (!containsNumber) {
-            addError("password should have one number at least");
-        } else {
-            increaseConditionsMetCount();
-        }
+        verifyCondition(!containsNumber, "password should have one number at least");
+    }
+
+    public boolean isRequiredNumberOfConditionsSatisfied() {
+        return numberOfConditionsMet >= 3;
     }
 
     private void verifyLength() {
-        if (!isLargeEnough(password.length())) {
-            addError(String.format("password should be larger than %d chars", MIN_PASSWORD_LENGTH - 1));
-        } else {
-            increaseConditionsMetCount();
-        }
+        verifyCondition(isShort(password.length()),
+                String.format("password should be larger than %d chars", MIN_PASSWORD_LENGTH - 1));
     }
 
-    private boolean isLargeEnough(int length) {
-        return length >= MIN_PASSWORD_LENGTH;
+    private boolean isShort(int length) {
+        return length < MIN_PASSWORD_LENGTH;
     }
 
     private String constructErrorMessage() {
