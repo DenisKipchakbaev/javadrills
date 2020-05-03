@@ -1,5 +1,7 @@
 package com.teamagile.javadrills;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,12 +22,16 @@ public class LoginManager {
         users.add(new User(user, pass));
         try {
             TraceMessage traceMessage = new TraceMessage(
-                    String.format("logon by user '%s' and password '%s'", user, pass),
+                    String.format("%s - logon by user '%s' and password '%s'", getCurrentDateTime(), user, pass),
                     100);
             logger.write(traceMessage);
         } catch (RuntimeException e) {
             webService.notify("the error from the logger");
         }
+    }
+
+    public String getCurrentDateTime() {
+        return LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
     }
 
     public Boolean isLoginOK(String user, String pass) {

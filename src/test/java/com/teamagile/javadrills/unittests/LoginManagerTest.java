@@ -8,6 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -45,14 +49,21 @@ public class LoginManagerTest {
     @Test
     public void addUser_withSlowLogger_slowLoggerNotified() throws InterruptedException {
         LoginManager lm = getLoginManager();
+        LoginManager loginManagerSpy = spy(lm);
+        doReturn(getFakeDateTimeFormatted()).when(loginManagerSpy).getCurrentDateTime();
 
-        lm.addUser("a", "pass");
+        loginManagerSpy.addUser("a", "pass");
 
         ArgumentCaptor<TraceMessage> traceMessageCaptor = ArgumentCaptor.forClass(TraceMessage.class);
         verify(loggerMock).write(traceMessageCaptor.capture());
         TraceMessage traceMessage = traceMessageCaptor.getValue();
-        assertEquals("logon by user 'a' and password 'pass'", traceMessage.getText());
+        assertEquals("1970-01-01T00:00:00 - logon by user 'a' and password 'pass'", traceMessage.getText());
         assertEquals(100, traceMessage.getSeverity());
+    }
+
+    private String getFakeDateTimeFormatted() {
+        return LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0)
+                .format(DateTimeFormatter.ISO_DATE_TIME);
     }
 
     @Test
@@ -88,6 +99,5 @@ public class LoginManagerTest {
         verify(loggerMock).write(traceMessageCaptor.capture());
         TraceMessage traceMessage = traceMessageCaptor.getValue();
         assertEquals("password not changed", traceMessage.getText());
-        ;
     }
 }
